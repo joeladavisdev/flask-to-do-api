@@ -1,9 +1,11 @@
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
+from flask_cors import CORS
 import os
 
 app = Flask(__name__)
+CORS(app)
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + os.path.join(basedir, "app.sqlite")
@@ -37,12 +39,9 @@ def hello():
 def add_todo():
     title= request.json['title']
     done = request.json['done']
-
     new_todo = Todo(title, done)
-
     db.session.add(new_todo)
     db.session.commit()
-
     todo = Todo.query.get(new_todo.id)
     return todo_schema.jsonify(todo)
     
@@ -66,7 +65,6 @@ def delete_todo(id):
     db.session.delete(todo)
     db.session.commit()
     return jsonify("Todo Deleted")
-
 
 if __name__ == "__main__":
     app.debug = True
